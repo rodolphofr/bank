@@ -1,7 +1,7 @@
 System.register(["./BootstrapAlertMessageType"], function (exports_1, context_1) {
     "use strict";
-    var __moduleName = context_1 && context_1.id;
     var BootstrapAlertMessageType_1, Message;
+    var __moduleName = context_1 && context_1.id;
     return {
         setters: [
             function (BootstrapAlertMessageType_1_1) {

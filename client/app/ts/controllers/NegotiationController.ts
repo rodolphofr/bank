@@ -3,6 +3,7 @@ import { Negotiation, NegotiationsList, Message, BootstrapAlertMessageType } fro
 import { MessageView, NegotiationsListView } from "../views/index";
 import { domInject, throttle } from "../helpers/decorators/index";
 import { NegotiationService } from "../services/index";
+import { print } from "../helpers/Utils";
 
 export class NegotiationController {
 
@@ -43,27 +44,39 @@ export class NegotiationController {
         this._negotiationsListView.update(this._negotiationsList);
         this._messageView.update(new Message('Negociacao adicionada com sucesso.', BootstrapAlertMessageType.SUCCESS));
 
+        print(negotiation, this._negotiationsList);
+
     }
 
     @throttle(500)
-    import() {
+    async import() {
 
         function isOk(response: Response) {
 
             if (response.ok)
                 return response;
             
-            throw new Error('Failt to import negotations.');
+            throw new Error('Fail to import negotations.');
 
         }
 
-        this._service.importNegotiations(isOk)
-            .then(negotiations => {
-                
-                negotiations.forEach(n => this._negotiationsList.add(n));
+        try {
+            
+            const imported = await this._service.importNegotiations(isOk)
+            const alreadyImported = this._negotiationsList.toArray();
+    
+            const news = imported.filter(negotiation => !alreadyImported.some(n => n.equals(negotiation)));
+                    
+            if (news.length) {
+                news.forEach(negotiation => this._negotiationsList.add(negotiation));
                 this._negotiationsListView.update(this._negotiationsList);
+            }
 
-            });
+        } catch (error) {
+            
+            this._messageView.update(new Message(error.message, BootstrapAlertMessageType.DANGER));
+
+        }
 
     }
 

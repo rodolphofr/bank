@@ -1,5 +1,6 @@
-import { Negotiation, PartialNegotiation } from "../models/index";
-import { HandleFunction } from "./HandleFunction";
+import { Negotiation } from "../models/index";
+import { HandleFunction } from "./interfaces/HandleFunction";
+import { PartialNegotiation } from "../models/interfaces/index";
 
 export class NegotiationService {
 
@@ -10,7 +11,11 @@ export class NegotiationService {
             .then(res => res.json())
             .then((data: PartialNegotiation[]) =>
                 data.map(partial => new Negotiation(new Date(), partial.montante, partial.vezes))
-            );
+            )
+            .catch(error => { 
+                console.log(error);
+                throw new Error('Falhou ao tentar importar negociacoes.');
+            });
         
 
     }
